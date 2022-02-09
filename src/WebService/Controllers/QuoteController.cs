@@ -21,8 +21,11 @@ namespace WebService.Controllers
 
       // GET /api/stock/{stock_id}/{timeframe}
       [HttpGet(Name = "Get quotes by query parametrs")]
-      public async Task<IActionResult> Index(int stock_id,int timeframe,[FromQuery(Name = "From Date")]DateTime from,[FromQuery(Name = "Till Date")]DateTime till)
+      public async Task<IActionResult> GetQuotesByQuery(int stock_id,int timeframe,[FromQuery(Name = "From Date")]DateTime from,[FromQuery(Name = "Till Date")]DateTime till)
       {
+          _logger.LogInformation( LogEvent.CallEndpoint(nameof(QuoteController),nameof(GetQuotesByQuery)),
+              "Request Quotes for: StockId {@stock}, timeframe {@timeframe}, from {@from} till {@till}", stock_id, timeframe, from,
+              till);
           var from_d = new DateOnly(from.Year, from.Month, from.Day);
           var till_d = new DateOnly(till.Year, till.Month, till.Day);
           var quotesDTOs = await _quoteSource.Download(stock_id, timeframe, from_d, till_d);

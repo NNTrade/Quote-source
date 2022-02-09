@@ -32,19 +32,29 @@ namespace AppCore
 
             var _stockTimeFrames = _dbContext.StockTimeFrame.SingleOrDefault(s =>
                 s.StockId == stockId && s.TimeFrameId == (TimeFrame.Enum)timeFrameId);
+
             if (_stockTimeFrames == null)
             {
-                if (!_dbContext.Stock.Any(s => s.Id == stockId))
+                var stock = await _dbContext.Stock.SingleOrDefaultAsync(s => s.Id == stockId);
+                if (stock == null)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(stockId), stockId,
-                        $"There is no stock with id {stockId}");
+                    _logger.LogException(LogEvent.NoStock,
+                        new ArgumentOutOfRangeException(nameof(stockId), stockId,
+                            $"Couldn't find stock"),
+                        "Try load unknown stock {@stock}", stockId);
                 }
 
-                if (!_dbContext.TimeFrame.Any(t => t.Id == (TimeFrame.Enum)timeFrameId))
+                var tf = await _dbContext.TimeFrame.SingleOrDefaultAsync(t => t.Id == (TimeFrame.Enum)timeFrameId);
+                if (tf == null)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(timeFrameId), timeFrameId,
-                        $"There is no timeframe with id {timeFrameId}");
+                    _logger.LogException(LogEvent.NoStock,
+                        new ArgumentOutOfRangeException(nameof(timeFrameId), timeFrameId,
+                            $"Couldn't find timeframe"),
+                        "Try load unknown stock {@stock}", stockId);
                 }
+
+                _logger.LogInformation(LogEvent.NoStockTimeFrame.GetEventId(),
+                    "Request new TimeFrame {@timeframe} for stock {@stock}", (tf.Name), stock.Code);
 
                 _stockTimeFrames = await LoadAll(stockId, (TimeFrame.Enum)timeFrameId, @from_dt, @till_dt);
             }
@@ -67,13 +77,13 @@ namespace AppCore
         private async Task DownloadFrom(StockTimeFrame stockTimeFrame, DateTime @from)
         {
             stockTimeFrame.LoadedFrom = @from;
-            await LoadStockTimeFrame(stockTimeFrame,@from, stockTimeFrame.LoadedFrom);
+            await LoadStockTimeFrame(stockTimeFrame, @from, stockTimeFrame.LoadedFrom);
         }
 
         private async Task DownloadTill(StockTimeFrame stockTimeFrame, DateTime @till)
         {
             stockTimeFrame.LoadedTill = @till;
-            await LoadStockTimeFrame(stockTimeFrame,stockTimeFrame.LoadedTill, till);
+            await LoadStockTimeFrame(stockTimeFrame, stockTimeFrame.LoadedTill, till);
         }
 
         private async Task<StockTimeFrame> LoadAll(int stockId, TimeFrame.Enum timeFrameId, DateTime @from,
@@ -89,12 +99,12 @@ namespace AppCore
                 TimeFrame = _dbContext.TimeFrame.Single(s => s.Id == timeFrameId)
             };
 
-            await LoadStockTimeFrame(stockTimeFrame,@from, till);
+            await LoadStockTimeFrame(stockTimeFrame, @from, till);
 
             return stockTimeFrame;
         }
 
-        private async Task LoadStockTimeFrame(StockTimeFrame stockTimeFrame,DateTime @from, DateTime till)
+        private async Task LoadStockTimeFrame(StockTimeFrame stockTimeFrame, DateTime @from, DateTime till)
         {
             using var _transaction = _dbContext.Database.BeginTransaction();
 

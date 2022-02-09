@@ -16,6 +16,7 @@ namespace WebService
             var logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
+            loggingBuilder.ClearProviders();
             loggingBuilder.AddProvider(new SerilogLoggerProvider(logger));
         }
     }

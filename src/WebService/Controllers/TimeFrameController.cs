@@ -19,8 +19,10 @@ namespace WebService.Controllers
         }
         // GET
         [HttpGet(Name = "Get all TimeFrames")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> GetAllTimeframe()
         {
+            _logger.LogInformation( LogEvent.CallEndpoint(nameof(TimeFrameController),nameof(GetAllTimeframe)),
+                "Request timeframe list");
             var _timeFrames = await _quoteSource.TimeFrames;
             return Ok(_timeFrames);
         }

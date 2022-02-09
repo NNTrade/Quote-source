@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebService;
@@ -19,12 +20,8 @@ builder.Host.ConfigureLogging(logging =>
 });
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -34,6 +31,11 @@ app.Services.CheckDbInit();
 
 app.MapControllers();
 
+void ee(HttpContext context)
+{
+    context.Response.Redirect("/swagger/index.html");
+}
+app.Map("/", ee);
 app.Run();
 
 public partial class Program { }

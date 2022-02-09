@@ -19,8 +19,10 @@ namespace WebService.Controllers
         }
         // GET
         [HttpGet(Name = "Get all Markets")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> GetMarkets()
         {
+            _logger.LogInformation( LogEvent.CallEndpoint(nameof(MarketController),nameof(GetMarkets)),
+                "Request market list");
             var _timeFrames = await _quoteSource.Markets;
             return Ok(_timeFrames);
         }

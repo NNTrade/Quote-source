@@ -20,8 +20,10 @@ namespace WebService.Controllers
 
         // GET /api/market/{market_id}/stock?code=
         [HttpGet(Name = "Get Stocks by query parametrs")]
-        public async Task<IActionResult> Index(int market_id, [FromQuery]string? code = null)
+        public async Task<IActionResult> GetStockByQuery(int market_id, [FromQuery]string? code = null)
         {
+            _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockController),nameof(GetStockByQuery)),
+                "Request stock for: MarketId {@market_id}, Code {@code}", market_id,code);
             var _stockDtos = await _quoteSource.StockSearch(market_id, code ?? "");
             return Ok(_stockDtos);
         }
