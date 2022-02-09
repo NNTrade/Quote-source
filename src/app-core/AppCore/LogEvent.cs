@@ -6,11 +6,11 @@ namespace AppCore
     public enum LogEvent
     {
         NoStockTimeFrame = 1,
-        NoStock = 2
+        NoStock = 2,
+        LoadData = 3,
     }
     public static class LogEventExt
     {
-
         public static EventId GetEventId(this LogEvent s1)
         {
             string name ;
@@ -22,8 +22,12 @@ namespace AppCore
                 case LogEvent.NoStock:
                     name = "Request unknown stock";
                     break;
+                case LogEvent.LoadData:
+                    name = "Load data from source";
+                    break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(s1), s1, null);
+                    name = $"Enum.{s1.ToString()}";
+                    break;
             }
             return new EventId((int)s1, name);
         }

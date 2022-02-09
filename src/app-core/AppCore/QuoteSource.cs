@@ -30,8 +30,10 @@ namespace AppCore
             var from_dt = new DateTime(@from.Year, @from.Month, @from.Day, 0, 0, 0, DateTimeKind.Utc);
             var till_dt = new DateTime(@till.Year, @till.Month, @till.Day, 0, 0, 0, DateTimeKind.Utc);
 
-            var _stockTimeFrames = _dbContext.StockTimeFrame.SingleOrDefault(s =>
-                s.StockId == stockId && s.TimeFrameId == (TimeFrame.Enum)timeFrameId);
+            var _stockTimeFrames = _dbContext.StockTimeFrame
+                .Include(s => s.Stock)
+                .Include(s => s.TimeFrame)
+                .SingleOrDefault(s => s.StockId == stockId && s.TimeFrameId == (TimeFrame.Enum)timeFrameId);
 
             if (_stockTimeFrames == null)
             {
@@ -107,23 +109,43 @@ namespace AppCore
         private async Task LoadStockTimeFrame(StockTimeFrame stockTimeFrame, DateTime @from, DateTime till)
         {
             using var _transaction = _dbContext.Database.BeginTransaction();
+            _logger.LogInformation(LogEvent.LoadData.GetEventId(),
+                "Start loading data for stock {@stock} timeframe {@tf} interval {@from} - {@till}", stockTimeFrame
+                    .Stock
+                    .Code, stockTimeFrame.TimeFrame.Name, from, till);
 
             _dbContext.StockTimeFrame.Update(stockTimeFrame);
             await _dbContext.SaveChangesAsync();
 
-            await LoadStocks(stockTimeFrame, @from, till);
+            var newFrom = from;
+            var newTill = from;
+
+            do
+            {
+                newTill += new TimeSpan(365);
+                if (newTill >= till) newTill = till;
+
+                await LoadStocks(stockTimeFrame, newFrom, newTill);
+                newFrom = newTill;
+            } while (newFrom < newTill);
 
             await _transaction.CommitAsync();
+            _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Loading new data for Stock TimeFrame completed");
         }
 
         private async Task LoadStocks(StockTimeFrame _stockTimeFrame, DateTime @from, DateTime till)
         {
-            var newStocks =
-                await _downloader.Download(_stockTimeFrame.StockId, _stockTimeFrame.TimeFrameId, @from, @till);
+            _logger.LogInformation(LogEvent.LoadData.GetEventId(),
+                "Downloading data: interval {@from} - {@till}", from, till);
+            var _newStocks =
+                (await _downloader.Download(_stockTimeFrame.StockId, _stockTimeFrame.TimeFrameId, @from, @till))
+                .ToArray();
+            _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Download success, load {@rows} rows",
+                _newStocks.Length);
 
             try
             {
-                newStocks.ForEach(quote =>
+                _newStocks.ForEach(quote =>
                 {
                     quote.CandleStart = new DateTime(quote.CandleStart.Year, quote.CandleStart.Month,
                         quote.CandleStart.Day,
@@ -132,10 +154,14 @@ namespace AppCore
                     quote.StockTimeFrame = _stockTimeFrame;
                 });
 
-                newStocks = RemoveDuplicateQuote(_stockTimeFrame, newStocks);
+                var _uniqueNewStocks = RemoveDuplicateQuote(_stockTimeFrame, _newStocks).ToArray();
+                _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Remove {@dup} duplicates while compare with DB",
+                    (_newStocks.Length - _uniqueNewStocks.Length));
 
-                await _dbContext.Quote.AddRangeAsync(newStocks);
+                _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Append new {@rows} rows to DB", _uniqueNewStocks.Length);
+                await _dbContext.Quote.AddRangeAsync(_uniqueNewStocks);
                 await _dbContext.SaveChangesAsync();
+                _logger.LogInformation(LogEvent.LoadData.GetEventId(), "New data saved");
             }
             catch (Exception e)
             {
