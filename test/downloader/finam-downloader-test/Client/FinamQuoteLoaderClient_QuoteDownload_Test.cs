@@ -1,18 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using database.entity;
 using finam_downloader;
-using AppCore;
 using finam_downloader.models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Abstractions;
 using migration;
 using Xunit;
 using Xunit.Abstractions;
-using IDownloader = downloader_interactor.IDownloader;
 
 namespace finam_downloader_test
 {

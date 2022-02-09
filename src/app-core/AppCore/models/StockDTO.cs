@@ -8,8 +8,8 @@ namespace AppCore.models
 
         public int MarketId { get; set; }
 
-        public string Code { get; set; }
-        public string Name { get; set; }
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
     }
 
     public static class StockConverters{

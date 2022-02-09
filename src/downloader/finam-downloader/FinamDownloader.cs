@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using database;
 using database.entity;
 using finam_downloader.models;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using IDownloader = downloader_interactor.IDownloader;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace finam_downloader
 {

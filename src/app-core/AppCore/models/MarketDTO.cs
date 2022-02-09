@@ -5,7 +5,7 @@ namespace AppCore.models
     public class MarketDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
     }
 
     public static class MarketConverters{

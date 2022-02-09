@@ -10,7 +10,6 @@ using downloader_interactor;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -21,7 +20,7 @@ namespace WebServiceTest.Controllers
     public class StockControllerTest
     {
         protected readonly ITestOutputHelper _output;
-        private IAsyncQuoteSource _asyncQuoteSource { get; set; }
+        private IAsyncQuoteSource AsyncQuoteSource { get; set; }
         private HttpClient _client;
 
         public StockControllerTest(ITestOutputHelper output)
@@ -41,7 +40,7 @@ namespace WebServiceTest.Controllers
                         sc.Remove(sc.Single(s => s.ServiceType == typeof(IAsyncQuoteSource)));
                         sc.Remove(sc.Single(s => s.ServiceType == typeof(IIniter)));
                         sc.AddScoped<IIniter>(sp=>Substitute.For<IIniter>());
-                        sc.AddScoped<IAsyncQuoteSource>(provider => _asyncQuoteSource);
+                        sc.AddScoped<IAsyncQuoteSource>(provider => AsyncQuoteSource!);
                     });
                 });
             _client = application.CreateClient();
@@ -72,8 +71,8 @@ namespace WebServiceTest.Controllers
                     Name = "Bpple"
                 },
             };
-            _asyncQuoteSource = Substitute.For<IAsyncQuoteSource>();
-            _asyncQuoteSource.StockSearch(3, "").Returns(info => Task.FromResult<IList<StockDTO>>(expectedDTOs));
+            AsyncQuoteSource = Substitute.For<IAsyncQuoteSource>();
+            AsyncQuoteSource.StockSearch(3, "").Returns(info => Task.FromResult<IList<StockDTO>>(expectedDTOs));
             #endregion
 
             #region Act
@@ -85,7 +84,7 @@ namespace WebServiceTest.Controllers
             #region Assert
             _output.WriteLine(response.Content.ReadAsStringAsync().Result);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            _asyncQuoteSource.Received().StockSearch(3, "");
+            await AsyncQuoteSource.Received().StockSearch(3, "");
 
             #endregion
         }
@@ -113,8 +112,8 @@ namespace WebServiceTest.Controllers
                     Name = "Bpple"
                 },
             };
-            _asyncQuoteSource = Substitute.For<IAsyncQuoteSource>();
-            _asyncQuoteSource.StockSearch(3, "123").Returns(info => Task.FromResult<IList<StockDTO>>(expectedDTOs));
+            AsyncQuoteSource = Substitute.For<IAsyncQuoteSource>();
+            AsyncQuoteSource.StockSearch(3, "123").Returns(info => Task.FromResult<IList<StockDTO>>(expectedDTOs));
             #endregion
 
             #region Act
@@ -128,7 +127,7 @@ namespace WebServiceTest.Controllers
             var response_payload = response.Content.ReadAsStringAsync().Result;
             _output.WriteLine(response_payload);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            _asyncQuoteSource.Received().StockSearch(3, "123");
+            await AsyncQuoteSource.Received().StockSearch(3, "123");
             Assert.Equal("[{\"id\":1,\"marketId\":3,\"code\":\"AAPL\",\"name\":\"Apple\"},{\"id\":2,\"marketId\":3,\"code\":\"BAPL\",\"name\":\"Bpple\"}]", response_payload);
             #endregion
         }

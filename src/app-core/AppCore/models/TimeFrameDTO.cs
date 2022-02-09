@@ -5,7 +5,7 @@ namespace AppCore.models
     public class TimeFrameDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
     }
 
     public static class TimeFrameConverters{

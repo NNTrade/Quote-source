@@ -1,12 +1,17 @@
 using System;
+using System.Reflection;
 using database;
 using downloader_interactor;
 using finam_downloader;
 using AppCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 namespace WebService
 {
@@ -17,6 +22,7 @@ namespace WebService
             return serviceProvider.GetService<ILoggerFactory>()!.CreateLogger<T>();
         }
 
+
         public static IServiceCollection AddDatabase(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddDbContext<QuoteSourceDbContext>((provider, builder) =>
@@ -24,7 +30,6 @@ namespace WebService
                 builder.UseNpgsql(provider.GetService<IConfiguration>()
                     .GetConnectionString("DefaultConnection"));
                 builder.EnableDetailedErrors();
-
             });
             return serviceCollection;
         }
@@ -40,6 +45,7 @@ namespace WebService
             serviceCollection.AddScoped<IDownloader, FinamDownloader>();
             serviceCollection.AddScoped<IAsyncQuoteSource, QuoteSource>();
             serviceCollection.AddScoped<IIniter, Initer>();
+
             return serviceCollection;
         }
 

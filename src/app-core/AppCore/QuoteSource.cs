@@ -147,7 +147,7 @@ namespace AppCore
         public async Task<IList<StockDTO>> StockSearch(int marketId, string code)
         {
             var _stocks = _dbContext.Stock.Where(s => s.MarketId == (Market.Enum)marketId && s.Code.Contains(code));
-            return _stocks.ToList().ConvertAll(s => s.ToDto());
+            return await _stocks.Select(s => s.ToDto()).ToListAsync();
         }
 
         public Task<List<MarketDTO>> Markets => _dbContext.Market.Select(m => m.ToDto()).ToListAsync();

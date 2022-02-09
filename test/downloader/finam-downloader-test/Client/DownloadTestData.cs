@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using database.entity;
 using finam_downloader.models;
 using Newtonsoft.Json;
 
