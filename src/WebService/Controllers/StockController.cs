@@ -1,5 +1,7 @@
+using System.Net;
 using System.Threading.Tasks;
 using AppCore;
+using AppCore.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using LogEvent = WebService.Logging.LogEvent;
@@ -21,6 +23,7 @@ namespace WebService.Controllers
 
         // GET /api/market/{market_id}/stock?code=
         [HttpGet(Name = "Get Stocks by query parametrs")]
+        [ProducesResponseType(typeof(StockDTO), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetStockByQuery(int market_id, [FromQuery]string? code = null)
         {
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockController),nameof(GetStockByQuery)),

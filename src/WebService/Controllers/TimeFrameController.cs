@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Threading.Tasks;
 using AppCore;
+using AppCore.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using LogEvent = WebService.Logging.LogEvent;
@@ -21,6 +23,7 @@ namespace WebService.Controllers
         }
         // GET
         [HttpGet(Name = "Get all TimeFrames")]
+        [ProducesResponseType(typeof(TimeFrameDTO), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAllTimeframe()
         {
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(TimeFrameController),nameof(GetAllTimeframe)),

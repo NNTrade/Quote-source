@@ -1,6 +1,8 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using AppCore;
+using AppCore.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using LogEvent = WebService.Logging.LogEvent;
@@ -22,6 +24,7 @@ namespace WebService.Controllers
 
       // GET /api/stock/{stock_id}/timeframe/{timeframe}/quote
       [HttpGet(Name = "Get quotes by query parameters")]
+      [ProducesResponseType(typeof(CandleDTO), (int)HttpStatusCode.OK)]
       public async Task<IActionResult> GetQuotesByQuery(int stock_id,int timeframe,[FromQuery(Name = "From Date")]DateTime from,[FromQuery(Name = "Till Date")]DateTime till)
       {
           _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockTimeFrameQuoteController),nameof(GetQuotesByQuery)),

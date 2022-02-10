@@ -1,5 +1,7 @@
+using System.Net;
 using System.Threading.Tasks;
 using AppCore;
+using AppCore.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using LogEvent = WebService.Logging.LogEvent;
@@ -20,6 +22,7 @@ namespace WebService.Controllers
         }
         // GET
         [HttpGet(Name = "Get all Markets")]
+        [ProducesResponseType(typeof(MarketDTO), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetMarkets()
         {
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(MarketController),nameof(GetMarkets)),
