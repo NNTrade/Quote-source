@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using WebService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,14 +29,14 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.Services.CheckDbInit();
-
+app.AddCallLog();
 app.MapControllers();
 
-void ee(HttpContext context)
+void RedirectToSwaggerEe(HttpContext context)
 {
     context.Response.Redirect("/swagger/index.html");
 }
-app.Map("/", ee);
+app.Map("/", RedirectToSwaggerEe);
 app.Run();
 
 public partial class Program { }

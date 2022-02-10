@@ -9,10 +9,10 @@ namespace WebService.Controllers
     [Route("/api/market/{market_id}/[controller]")]
     public class StockController : ControllerBase
     {
-        private readonly ILogger<MarketController> _logger;
+        private readonly ILogger<StockController> _logger;
         private readonly IAsyncQuoteSource _quoteSource;
 
-        public StockController(ILogger<MarketController> logger, IAsyncQuoteSource quoteSource)
+        public StockController(ILogger<StockController> logger, IAsyncQuoteSource quoteSource)
         {
             _logger = logger;
             _quoteSource = quoteSource;

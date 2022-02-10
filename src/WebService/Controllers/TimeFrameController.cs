@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AppCore;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace WebService.Controllers
     [Route("/api/[controller]")]
     public class TimeFrameController : Controller
     {
-        private readonly ILogger<TimeFrameController> _logger;
+        private readonly ILogger _logger;
         private readonly IAsyncQuoteSource _quoteSource;
 
         public TimeFrameController(ILogger<TimeFrameController> logger, IAsyncQuoteSource quoteSource)
