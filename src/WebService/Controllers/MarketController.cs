@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using AppCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using LogEvent = WebService.Logging.LogEvent;
 
 namespace WebService.Controllers
 {

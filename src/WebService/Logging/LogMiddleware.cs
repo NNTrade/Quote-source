@@ -1,11 +1,8 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace WebService
+namespace WebService.Logging
 {
     public static class LogMiddlewareExtension
     {

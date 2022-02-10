@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Serilog;
 using WebService;
+using WebService.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +13,8 @@ builder.Services.AddServices();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Host.ConfigureLogging(logging =>
-{
-    logging.ConfigureLogging(builder.Configuration);
-});
+builder.ConfigLogging();
+
 var app = builder.Build();
 
 app.UseSwagger();
@@ -32,11 +28,7 @@ app.Services.CheckDbInit();
 app.AddCallLog();
 app.MapControllers();
 
-void RedirectToSwaggerEe(HttpContext context)
-{
-    context.Response.Redirect("/swagger/index.html");
-}
-app.Map("/", RedirectToSwaggerEe);
+app.AddRedirectToSwagger();
 app.Run();
 
 public partial class Program { }

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
-using WebService.Controllers;
 
-namespace WebService
+namespace WebService.Logging
 {
     public static class LogEvent
     {
