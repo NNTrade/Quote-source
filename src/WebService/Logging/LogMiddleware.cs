@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace WebService.Logging
 {
@@ -10,7 +10,8 @@ namespace WebService.Logging
         {
             webApplication.Use(async (context, next) =>
             {
-                context.RequestServices.GetService<ILogger>().Information("Called url ${url}", context.Request.Path);
+                context.RequestServices.GetService<ILogger>()
+                    .LogInformation("Called url ${url}", context.Request.Path);
                 await next(context);
             });
         }
