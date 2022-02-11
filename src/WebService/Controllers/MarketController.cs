@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AppCore;
@@ -22,7 +23,7 @@ namespace WebService.Controllers
         }
         // GET
         [HttpGet(Name = "Get all Markets")]
-        [ProducesResponseType(typeof(MarketDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<MarketDTO>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetMarkets()
         {
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(MarketController),nameof(GetMarkets)),

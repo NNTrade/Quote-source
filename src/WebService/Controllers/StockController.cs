@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AppCore;
@@ -23,7 +24,7 @@ namespace WebService.Controllers
 
         // GET /api/market/{market_id}/stock?code=
         [HttpGet(Name = "Get Stocks by query parametrs")]
-        [ProducesResponseType(typeof(StockDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<StockDTO>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetStockByQuery(int market_id, [FromQuery]string? code = null)
         {
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockController),nameof(GetStockByQuery)),

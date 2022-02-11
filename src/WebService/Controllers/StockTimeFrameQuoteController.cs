@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AppCore;
@@ -25,7 +26,7 @@ namespace WebService.Controllers
 
         // GET /api/stock/{stock_id}/timeframe/{timeframe}/quote
         [HttpGet(Name = "Get quotes by query parameters")]
-        [ProducesResponseType(typeof(CandleDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<CandleDTO>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetQuotesByQuery(int stock_id, int timeframe,
             [FromQuery(Name = "From Date")] DateTime from, [FromQuery(Name = "Till Date")] DateTime till)
         {

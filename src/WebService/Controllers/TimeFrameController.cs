@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace WebService.Controllers
         }
         // GET
         [HttpGet(Name = "Get all TimeFrames")]
-        [ProducesResponseType(typeof(TimeFrameDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<TimeFrameDTO>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAllTimeframe()
         {
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(TimeFrameController),nameof(GetAllTimeframe)),
