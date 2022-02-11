@@ -1,5 +1,7 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using WebService;
 using WebService.Logging;
 
@@ -12,7 +14,21 @@ builder.Services.AddDatabase();
 builder.Services.AddServices();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Quote source service API",
+        Description = "Service for getting and caching quote data",
+        Contact = new OpenApiContact
+        {
+            Name = "InsonusK",
+            Url = new Uri("https://github.com/InsonusK")
+        }
+    });
+});
 builder.ConfigLogging();
 
 var app = builder.Build();
