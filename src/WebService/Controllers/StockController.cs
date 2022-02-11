@@ -29,6 +29,9 @@ namespace WebService.Controllers
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockController),nameof(GetStockByQuery)),
                 "Request stock for: MarketId {@market_id}, Code {@code}", market_id,code);
             var _stockDtos = await _quoteSource.StockSearch(market_id, code ?? "");
+
+            _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockController),nameof(GetStockByQuery)),
+                $"Response list of stock with {_stockDtos.Count} rows");
             return Ok(_stockDtos);
         }
     }

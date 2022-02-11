@@ -28,6 +28,9 @@ namespace WebService.Controllers
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(MarketController),nameof(GetMarkets)),
                 "Request market list");
             var _timeFrames = await _quoteSource.Markets;
+
+            _logger.LogInformation( LogEvent.CallEndpoint(nameof(MarketController),nameof(GetMarkets)),
+                $"Response list of markets with {_timeFrames.Count} rows");
             return Ok(_timeFrames);
         }
     }

@@ -29,6 +29,9 @@ namespace WebService.Controllers
             _logger.LogInformation( LogEvent.CallEndpoint(nameof(TimeFrameController),nameof(GetAllTimeframe)),
                 "Request timeframe list");
             var _timeFrames = await _quoteSource.TimeFrames;
+
+            _logger.LogInformation( LogEvent.CallEndpoint(nameof(TimeFrameController),nameof(GetAllTimeframe)),
+                $"Response list of timeframes with {_timeFrames.Count} rows");
             return Ok(_timeFrames);
         }
     }
