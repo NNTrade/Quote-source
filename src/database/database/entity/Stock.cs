@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -30,7 +31,7 @@ namespace database.entity
             entityTypeBuilder
                 .HasIndex(e => new { e.MarketId, e.Code });
             entityTypeBuilder
-                .HasOne<Market>()
+                .HasOne<Market>(e=>e.Market)
                 .WithMany(e => e.Stocks)
                 .HasForeignKey(e => e.MarketId)
                 .OnDelete(DeleteBehavior.Cascade);

@@ -37,10 +37,12 @@ namespace database.entity
         public static void OnModelCreating(EntityTypeBuilder<Quote> entityTypeBuilder)
         {
             entityTypeBuilder
+                .Ignore(e => e.StockTimeFrameId);
+            entityTypeBuilder
                 .HasIndex(e => new { StockTimeFrame_Id = e.StockTimeFrameId, e.CandleStart })
                 .IsUnique();
             entityTypeBuilder
-                .HasOne<StockTimeFrame>()
+                .HasOne<StockTimeFrame>(s=>s.StockTimeFrame)
                 .WithMany(e => e.Quotes)
                 .HasForeignKey(e => e.StockTimeFrameId)
                 .OnDelete(DeleteBehavior.Cascade);

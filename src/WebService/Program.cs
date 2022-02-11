@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using WebService;
 using WebService.Logging;
@@ -25,7 +26,7 @@ builder.Services.AddSwaggerGen(options =>
         Contact = new OpenApiContact
         {
             Name = "InsonusK",
-            Url = new Uri("https://github.com/InsonusK")
+            Url = new Uri("https://github.com/NNTrade/Quote-source")
         }
     });
 });
@@ -39,6 +40,11 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+if (app.Environment.IsDevelopment())
+{
+    app.Services.DropDb();
+}
 
 app.Services.CheckDbInit();
 app.AddCallLog();

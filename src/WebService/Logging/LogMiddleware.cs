@@ -10,7 +10,8 @@ namespace WebService.Logging
         {
             webApplication.Use(async (context, next) =>
             {
-                context.RequestServices.GetService<ILoggerProvider>().CreateLogger("Controllers")
+                context.RequestServices.GetService<ILoggerProvider>()
+                    ?.CreateLogger("Controllers")
                     .LogInformation("Called url {$url}", context.Request.Path);
                 await next(context);
             });

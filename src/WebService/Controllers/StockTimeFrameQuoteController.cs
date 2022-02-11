@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
 using AppCore;
@@ -27,8 +28,8 @@ namespace WebService.Controllers
         // GET /api/stock/{stock_id}/timeframe/{timeframe}/quote
         [HttpGet(Name = "Get quotes by query parameters")]
         [ProducesResponseType(typeof(IList<CandleDTO>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetQuotesByQuery(int stock_id, int timeframe,
-            [FromQuery(Name = "From Date")] DateTime from, [FromQuery(Name = "Till Date")] DateTime till)
+        public async Task<IActionResult> GetQuotesByQuery([Required]int stock_id, [Required]int timeframe,
+            [Required][FromQuery(Name = "FromDate")] DateTime from, [Required][FromQuery(Name = "TillDate")] DateTime till)
         {
             _logger.LogInformation(
                 LogEvent.CallEndpoint(nameof(StockTimeFrameQuoteController), nameof(GetQuotesByQuery)),

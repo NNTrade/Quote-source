@@ -76,7 +76,7 @@ namespace finam_downloader_test
             await dbContext.Database.EnsureCreatedAsync();
 
             var client = new DefaultHttpClientFactory().CreateClient();
-            client.BaseAddress = new Uri("http://127.0.0.1:7001/");
+            client.BaseAddress = new Uri("http://192.168.34.2:7001/");
 
             IFinamQuoteLoaderClient _downloader = new FinamQuoteLoaderClient(_output.BuildLoggerFor<FinamQuoteLoaderClient>(),client);
 

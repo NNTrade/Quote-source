@@ -122,12 +122,12 @@ namespace AppCore
 
             do
             {
-                newTill += new TimeSpan(365);
+                newTill += new TimeSpan(365, 0, 0, 0);
                 if (newTill >= till) newTill = till;
 
                 await LoadStocks(stockTimeFrame, newFrom, newTill);
                 newFrom = newTill;
-            } while (newFrom < newTill);
+            } while (newFrom < till);
 
             await _transaction.CommitAsync();
             _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Loading new data for Stock TimeFrame completed");

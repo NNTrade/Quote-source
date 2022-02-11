@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,12 +33,12 @@ namespace database.entity
                     new { e.StockId, TimeFrame_Id = e.TimeFrameId })
                 .IsUnique();
             entityTypeBuilder
-                .HasOne<Stock>()
+                .HasOne<Stock>(e=>e.Stock)
                 .WithMany(e => e.StockTimeFrames)
                 .HasForeignKey(e => e.StockId)
                 .OnDelete(DeleteBehavior.Cascade);
             entityTypeBuilder
-                .HasOne<TimeFrame>()
+                .HasOne<TimeFrame>(e=>e.TimeFrame)
                 .WithMany(e => e.StockTimeFrames)
                 .HasForeignKey(e => e.TimeFrameId)
                 .OnDelete(DeleteBehavior.Cascade);

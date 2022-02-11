@@ -49,6 +49,13 @@ namespace WebService
             return serviceCollection;
         }
 
+        public static void DropDb(this IServiceProvider serviceProvider)
+        {
+            using var _scope = serviceProvider.CreateScope();
+            var _sp = _scope.ServiceProvider;
+            _sp.GetService<QuoteSourceDbContext>()?.Database.EnsureDeleted();
+        }
+
         public static void CheckDbInit(this IServiceProvider serviceProvider)
         {
             using var _scope = serviceProvider.CreateScope();
