@@ -9,9 +9,9 @@ namespace database.entity
         public enum Enum
         {
             //Year = 11,
-            Monthly = 10,
-            Weekly = 9,
-            Daily = 8,
+            Month = 10,
+            Week = 9,
+            Day = 8,
             //H4 = 7,
             Hour = 6,
             Minute30 = 5,

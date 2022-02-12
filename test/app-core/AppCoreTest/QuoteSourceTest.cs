@@ -33,7 +33,7 @@ namespace AppCoreTest
                 array_dbContext.SaveChanges();
             }
 
-            var expected_tf = TimeFrame.Enum.Daily;
+            var expected_tf = TimeFrame.Enum.Day;
             var expected_from_dt = new DateTime(2020, 1, 1);
             var expected_till_dt = new DateTime(2020, 1, 2);
             var expected_list = new List<Quote>()
@@ -70,7 +70,7 @@ namespace AppCoreTest
             {
                 QuoteSource _quoteSource =
                     new QuoteSource(act_dbContext, _output.BuildLoggerFor<QuoteSource>(), _downloader);
-                asserted_list = _quoteSource.Download(newStock.Id, (int)TimeFrame.Enum.Daily,
+                asserted_list = _quoteSource.Download(newStock.Id, (int)TimeFrame.Enum.Day,
                     new DateOnly(expected_from_dt.Year, expected_from_dt.Month, expected_from_dt.Day),
                     new DateOnly(expected_till_dt.Year, expected_till_dt.Month, expected_till_dt.Day)).Result;
             }

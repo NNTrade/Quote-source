@@ -9,11 +9,11 @@ namespace finam_downloader
         {
             switch (timeframe)
             {
-                case TimeFrame.Enum.Monthly:
+                case TimeFrame.Enum.Month:
                     return "MONTHLY";
-                case TimeFrame.Enum.Weekly:
+                case TimeFrame.Enum.Week:
                     return "WEEKLY";
-                case TimeFrame.Enum.Daily:
+                case TimeFrame.Enum.Day:
                     return "DAILY";
                 case TimeFrame.Enum.Hour:
                     return "HOURLY";
