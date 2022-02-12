@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using database;
 using database.entity;
-using migration;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -20,9 +19,7 @@ namespace database_test
         {
             #region Array
 
-            using var dbContext = new ContextFactory().CreateDbContext();
-            await dbContext.Database.EnsureDeletedAsync();
-            await dbContext.Database.EnsureCreatedAsync();
+            using var dbContext = BuildContext();
 
             #endregion
 
@@ -52,9 +49,7 @@ namespace database_test
         {
             #region Array
 
-            using var dbContext = new ContextFactory().CreateDbContext();
-            await dbContext.Database.EnsureDeletedAsync();
-            await dbContext.Database.EnsureCreatedAsync();
+            using var dbContext = BuildContext();
 
             #endregion
 

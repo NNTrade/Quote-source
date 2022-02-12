@@ -30,11 +30,16 @@ namespace database_test
             return _optionsBuilder;
         }
 
+        protected QuoteSourceDbContext BuildContext()
+        {
+            return new QuoteSourceDbContext(_optionsBuilder.Options);
+        }
+
         public BaseTest(string dbSuffix,ITestOutputHelper output)
         {
             _output = output;
             _optionsBuilder = GetOptionBuilder(dbSuffix);
-            using (var _context = new QuoteSourceDbContext(_optionsBuilder.Options))
+            using (var _context = BuildContext())
             {
                 _context.Database.EnsureDeleted();
                 _context.Database.Migrate();

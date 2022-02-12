@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using database;
 using database.entity;
-using migration;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -16,7 +15,7 @@ namespace database_test
         public AddDateTimeTest(ITestOutputHelper output) : base(
             nameof(QuoteSourceDbContext) + "_" + nameof(AddDateTimeTest), output)
         {
-            using var dbContext = new ContextFactory().CreateDbContext();
+            using var dbContext = BuildContext();
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
 
@@ -37,7 +36,7 @@ namespace database_test
         public async Task AddDataToDbSetTest()
         {
             StockTimeFrame expected_stf;
-            using (var dbContext = new ContextFactory().CreateDbContext())
+            using (var dbContext = BuildContext())
             {
                 #region Array
 
@@ -45,11 +44,12 @@ namespace database_test
                 {
                     StockId = newStock.Id,
                     Stock = dbContext.Stock.Single(s => s.Id == newStock.Id),
-                    TimeFrameId = TimeFrame.Enum.Daily,
-                    TimeFrame = dbContext.TimeFrame.Single(tf => tf.Id == TimeFrame.Enum.Daily),
-                    LoadedFrom = new DateTime(2020,1,2,0,0,0,DateTimeKind.Utc),
-                    LoadedTill = new DateTime(2020,1,3,0,0,0,DateTimeKind.Utc)
+                    TimeFrameId = TimeFrame.Enum.Day,
+                    TimeFrame = dbContext.TimeFrame.Single(tf => tf.Id == TimeFrame.Enum.Day),
+                    LoadedFrom = new DateTime(2020, 1, 2, 0, 0, 0, DateTimeKind.Utc),
+                    LoadedTill = new DateTime(2020, 1, 3, 0, 0, 0, DateTimeKind.Utc)
                 };
+
                 #endregion
 
                 #region Act
@@ -60,7 +60,8 @@ namespace database_test
                 #endregion
             }
 
-            using var dbContext2 = new ContextFactory().CreateDbContext();
+            using var dbContext2 = BuildContext();
+
             #region Assert
 
             var asserted_stf = dbContext2.StockTimeFrame.Single(s => s.Id == expected_stf.Id);
@@ -68,7 +69,6 @@ namespace database_test
             _output.WriteLine($"Asserted from {asserted_stf.LoadedFrom.ToString()}");
             Assert.Equal(expected_stf.LoadedFrom, asserted_stf.LoadedFrom);
             Assert.Equal(expected_stf.LoadedTill, asserted_stf.LoadedTill);
-
 
             #endregion
         }
