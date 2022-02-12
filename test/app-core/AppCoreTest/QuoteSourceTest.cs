@@ -8,6 +8,7 @@ using database;
 using database.entity;
 using database_test;
 using downloader_interactor;
+using finam_downloader;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
@@ -35,7 +36,7 @@ namespace AppCoreTest
 
             var expected_tf = TimeFrame.Enum.Day;
             var expected_from_dt = new DateTime(2020, 1, 1);
-            var expected_till_dt = new DateTime(2020, 1, 2);
+            var expected_till_dt = new DateTime(2020, 1, 3) - TimeSpan.FromMilliseconds(1);
             var expected_list = new List<Quote>()
             {
                 new Quote()
@@ -54,7 +55,7 @@ namespace AppCoreTest
                     High = 124.124m,
                     Low = 124.125m,
                     Close = 124.126m,
-                    Volume = 123456789 , //123 456 789
+                    Volume = 123456789, //123 456 789
                 }
             };
             IDownloader _downloader = Substitute.For<IDownloader>();
@@ -93,11 +94,13 @@ namespace AppCoreTest
             using (var assert_dbContext = new QuoteSourceDbContext(_optionsBuilder.Options))
             {
                 var asserted_stf =
-                    assert_dbContext.StockTimeFrame.Single(s => s.TimeFrameId == expected_tf && s.StockId == newStock.Id);
+                    assert_dbContext.StockTimeFrame.Single(
+                        s => s.TimeFrameId == expected_tf && s.StockId == newStock.Id);
                 Assert.Equal(expected_from_dt, asserted_stf.LoadedFrom);
                 Assert.Equal(expected_till_dt, asserted_stf.LoadedTill);
 
-                var asserted_db_quotes = assert_dbContext.Quote.Where(q => q.StockTimeFrameId == asserted_stf.Id).ToList();
+                var asserted_db_quotes =
+                    assert_dbContext.Quote.Where(q => q.StockTimeFrameId == asserted_stf.Id).ToList();
                 Assert.Equal(expected_list.Count, asserted_db_quotes.Count);
                 foreach (Quote expected_quote in expected_list)
                 {

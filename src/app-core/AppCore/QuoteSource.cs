@@ -29,6 +29,7 @@ namespace AppCore
         {
             var from_dt = new DateTime(@from.Year, @from.Month, @from.Day, 0, 0, 0, DateTimeKind.Utc);
             var till_dt = new DateTime(@till.Year, @till.Month, @till.Day, 0, 0, 0, DateTimeKind.Utc);
+            till_dt = till_dt + TimeSpan.FromDays(1) - TimeSpan.FromMilliseconds(1);
 
             var _stockTimeFrames = _dbContext.StockTimeFrame
                 .Include(s => s.Stock)
@@ -158,7 +159,8 @@ namespace AppCore
                 _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Remove {@dup} duplicates while compare with DB",
                     (_newStocks.Length - _uniqueNewStocks.Length));
 
-                _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Append new {@rows} rows to DB", _uniqueNewStocks.Length);
+                _logger.LogInformation(LogEvent.LoadData.GetEventId(), "Append new {@rows} rows to DB",
+                    _uniqueNewStocks.Length);
                 await _dbContext.Quote.AddRangeAsync(_uniqueNewStocks);
                 await _dbContext.SaveChangesAsync();
                 _logger.LogInformation(LogEvent.LoadData.GetEventId(), "New data saved");

@@ -13,22 +13,32 @@ namespace AppCore
     {
         private readonly QuoteSourceDbContext _dbContext;
         private readonly IDownloader _downloader;
-        private readonly ILogger<IIniter> _initer;
+        private readonly ILogger<IIniter> _logger;
 
-        public Initer(QuoteSourceDbContext dbContext, IDownloader downloader, ILogger<IIniter> initer)
+        public Initer(QuoteSourceDbContext dbContext, IDownloader downloader, ILogger<IIniter> logger)
         {
             _dbContext = dbContext;
             _downloader = downloader;
-            _initer = initer;
-            _initer.LogInformation($"Migrate to data base. Connection string: {_dbContext.Database.GetConnectionString()}");
+            _logger = logger;
+
+        }
+
+        public void Reinit()
+        {
+            _logger.LogInformation($"Reinit database. Connection string: {_dbContext.Database.GetConnectionString()}");
+            _dbContext!.Database.EnsureDeleted();
             _dbContext!.Database.Migrate();
+            InitStocks();
+            _logger.LogInformation($"Reinit database completed");
         }
 
         public void CheckInitStock()
         {
+            _logger.LogInformation($"Migrate to data base. Connection string: {_dbContext.Database.GetConnectionString()}");
+            _dbContext!.Database.Migrate();
             if (!_dbContext.Stock.Any())
             {
-                _initer.LogInformation("Stock list is Empty. Load stocks");
+                _logger.LogInformation("Stock list is Empty. Load stocks");
                 InitStocks();
             }
         }
@@ -36,7 +46,7 @@ namespace AppCore
         {
             foreach (Market.Enum market in Enum.GetValues<Market.Enum>())
             {
-                _initer.LogInformation($"Load stock from market: {market.ToString()}");
+                _logger.LogInformation($"Load stock from market: {market.ToString()}");
                 LoadStocks(market).Wait();
             }
             //await Parallel.ForEachAsync(Enum.GetValues<Market.Enum>(), (marketId, token) => LoadStocks(marketId));
@@ -54,7 +64,7 @@ namespace AppCore
 
             await _dbContext.Stock.AddRangeAsync(_stocks);
             await _dbContext.SaveChangesAsync();
-            _initer.LogInformation($"Load {_stocks.Count()} for market {marketId.ToString()}");
+            _logger.LogInformation($"Load {_stocks.Count()} for market {marketId.ToString()}");
         }
     }
 }
