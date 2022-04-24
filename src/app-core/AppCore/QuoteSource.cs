@@ -203,5 +203,10 @@ namespace AppCore
 
             return tfEnt.ToDto();
         }
+
+        public Task<List<StockDTO>> TopStock(int stockId, int yearsOfCount)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

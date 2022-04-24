@@ -13,5 +13,13 @@ namespace AppCore
         public Task<List<MarketDTO>> Markets { get; }
         public Task<List<TimeFrameDTO>> TimeFrames { get; }
         public TimeFrameDTO GetTimeFrame(string name);
+
+        /// <summary>
+        /// Get stock with most count of volume of trades
+        /// </summary>
+        /// <param name="market">Market ID</param>
+        /// <param name="yearsOfCount">Years for analis</param>
+        /// <returns></returns>
+        public Task<List<StockDTO>> TopStock(int market, int yearsOfCount);
     }
 }

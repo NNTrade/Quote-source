@@ -37,6 +37,15 @@ namespace database.entity
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
+        /// <summary>
+        /// Build instance of stock
+        /// </summary>
+        /// <param name="dbContext">Context of database</param>
+        /// <param name="marketId">ID of market</param>
+        /// <param name="code">Stock code</param>
+        /// <param name="name">Name of stock</param>
+        /// <param name="finamId">ID in finam source</param>
+        /// <returns>Instance of stock prepared to add into DbContext</returns>
         public static Stock Build(QuoteSourceDbContext dbContext, Market.Enum marketId, string code, string name,
             int finamId)
         {
