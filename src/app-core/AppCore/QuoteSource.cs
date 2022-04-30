@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AppCore.models;
 using database;
@@ -204,9 +206,85 @@ namespace AppCore
             return tfEnt.ToDto();
         }
 
-        public Task<List<StockDTO>> TopStock(int stockId, int yearsOfCount)
+        public async Task<TopStockLoadedStatusDTO> LoadedStocks(int marketId, int yearsOfCount)
         {
-            throw new NotImplementedException();
+            DateTime _till = DateTime.Now.ToUniversalTime() - TimeSpan.FromDays(1);
+            DateTime _from = _till - TimeSpan.FromDays(365 * yearsOfCount);
+
+            var _stocks = await _dbContext.Stock.Where(s => s.MarketId == (Market.Enum)marketId).ToListAsync();
+            if (_stocks.Count == 0)
+            {
+                var ex = new ArgumentOutOfRangeException(nameof(marketId), marketId, "Unknown market");
+                _logger.LogInformation(ex, "Unknown market id {0}", marketId);
+                throw ex;
+            }
+
+            var _stockTimeFrames = await _dbContext.StockTimeFrame.Include(stf => stf.Stock)
+                .Where(stf => stf.TimeFrameId == TimeFrame.Enum.Month && stf.Stock.MarketId == (Market.Enum)marketId &&
+                              stf.LoadedFrom > _from && stf.LoadedTill < _till).ToListAsync();
+
+            var _stockTimeFramesIds = _stockTimeFrames.Select(stf => stf.Id);
+            var _loadedStocks = _stockTimeFrames.Select(stf => stf.StockId);
+            var _unLoadStocks = _stocks.Where(s => !_loadedStocks.Contains(s.Id));
+
+            var loadedStocks = await _dbContext.Quote
+                .Include(q => q.Stock)
+                .Where(q =>
+                    _stockTimeFramesIds.Contains(q.StockTimeFrameId) && q.CandleStart >= _from &&
+                    q.CandleStart <= _till).ToListAsync();
+
+            Task.Run((async () =>
+            {
+                foreach (var _unLoadStock in _unLoadStocks)
+                {
+                    await Download(_unLoadStock.Id, (int)TimeFrame.Enum.Day, DateOnly.FromDateTime(_from),
+                        DateOnly.FromDateTime(_till));
+                }
+            })).Start();
+        }
+
+        private Dictionary<Stock, List<Quote>> splitQuotes(IEnumerable<Quote> quotes)
+        {
+            Dictionary<Stock, List<Candle>> _ret = new();
+            foreach (var _candleDto in quotes)
+            {
+                if (_ret.TryGetValue(_candleDto.Stock.ToDto())
+            }
+        }
+
+
+        public async Task<List<StockDTO>> TopStockByVolume(int marketId, int yearsOfCount, int topCount)
+        {
+            DateTime _till = DateTime.Now.ToUniversalTime() - TimeSpan.FromDays(1);
+            DateTime _from = _till - TimeSpan.FromDays(365 * yearsOfCount);
+
+            var _stocks = await _dbContext.Stock.Where(s => s.MarketId == (Market.Enum)marketId).ToListAsync();
+            if (_stocks.Count == 0)
+            {
+                var ex = new ArgumentOutOfRangeException(nameof(marketId), marketId, "Unknown market");
+                _logger.LogInformation(ex, "Unknown market id {0}", marketId);
+                throw ex;
+            }
+
+            List<Tuple<decimal, Stock>> _topStock = new List<Tuple<decimal, Stock>>();
+
+            foreach (var _stock in _stocks)
+            {
+                var _candles = await Download(_stock.Id, (int)TimeFrame.Enum.Day, DateOnly.FromDateTime(_from),
+                    DateOnly.FromDateTime(_till));
+                decimal volumeCount = _candles.Sum(_candle => _candle.Volume);
+                _topStock.Add(new Tuple<decimal, Stock>(volumeCount, _stock));
+            }
+
+            _topStock.Sort((tuple, tuple1) => tuple.Item1.CompareTo(tuple1.Item2));
+
+            List<StockDTO> _ret = new();
+            for (int i = 0; i < topCount; i++)
+            {
+                _ret.Add(_topStock[i].Item2.ToDto());
+            }
+
+            return _ret;
         }
     }
 }

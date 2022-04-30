@@ -27,10 +27,12 @@ namespace database.entity
         public decimal Volume { get; set; }
 
         public int StockTimeFrameId { get; set; }
+        public int StockId { get; set; }
 
         #region relations
 
         public StockTimeFrame StockTimeFrame { get; set; }
+        public Stock Stock { get; set; }
 
         #endregion
 
@@ -42,11 +44,18 @@ namespace database.entity
                 .HasIndex(e => new { StockTimeFrame_Id = e.StockTimeFrameId, e.CandleStart })
                 .IsUnique();
             entityTypeBuilder
-                .HasOne<StockTimeFrame>(s=>s.StockTimeFrame)
+                .HasOne<StockTimeFrame>(s => s.StockTimeFrame)
                 .WithMany(e => e.Quotes)
                 .HasForeignKey(e => e.StockTimeFrameId)
                 .OnDelete(DeleteBehavior.Cascade);
             entityTypeBuilder.Property(e => e.CandleStart).HasConversion<DateTime>();
+
+            entityTypeBuilder
+                .HasOne(e => e.Stock)
+                .WithMany(e => e.Quotes)
+                .HasForeignKey(e => e.StockId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
         }
     }
 }

@@ -17,9 +17,10 @@ namespace AppCore
         /// <summary>
         /// Get stock with most count of volume of trades
         /// </summary>
-        /// <param name="market">Market ID</param>
+        /// <param name="marketId">Market ID</param>
         /// <param name="yearsOfCount">Years for analis</param>
+        /// <param name="topCount">Count of top stocks</param>
         /// <returns></returns>
-        public Task<List<StockDTO>> TopStock(int market, int yearsOfCount);
+        public Task<List<StockDTO>> TopStockByVolume(int marketId, int yearsOfCount, int topCount);
     }
 }

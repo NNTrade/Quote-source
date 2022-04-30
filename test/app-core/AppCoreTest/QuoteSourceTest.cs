@@ -22,68 +22,6 @@ namespace AppCoreTest
         }
 
         [Fact]
-        public void TopStockLoadLoadStockInNotExist()
-        {
-            #region Array
-
-            Stock newStock;
-            using (var array_dbContext = new QuoteSourceDbContext(_optionsBuilder.Options))
-            {
-                newStock = Stock.Build(array_dbContext, Market.Enum.UsaStock, "AAPL", "Apple", 123);
-                array_dbContext.Stock.Add(newStock);
-                array_dbContext.SaveChanges();
-            }
-            var expected_tf = TimeFrame.Enum.Day;
-            var expected_from_dt = DateTime.Now - TimeSpan.FromDays(1) - TimeSpan.FromDays(365);
-            var expected_till_dt = DateTime.Now - TimeSpan.FromDays(1) - TimeSpan.FromMilliseconds(1);
-            var expected_list = new List<Quote>()
-            {
-                new Quote()
-                {
-                    CandleStart = new DateTime(2020, 1, 1, 1, 1, 1),
-                    Open = 123.123m,
-                    High = 123.124m,
-                    Low = 123.125m,
-                    Close = 123.126m,
-                    Volume = 1234,
-                },
-                new Quote()
-                {
-                    CandleStart = new DateTime(2020, 1, 1, 1, 1, 2),
-                    Open = 124.123m,
-                    High = 124.124m,
-                    Low = 124.125m,
-                    Close = 124.126m,
-                    Volume = 123456789, //123 456 789
-                }
-            };
-
-            IDownloader _downloader = Substitute.For<IDownloader>();
-            _downloader.Download(newStock.Id, expected_tf, expected_from_dt, expected_till_dt)
-                .Returns((info => Task.FromResult<IEnumerable<Quote>>(expected_list)));
-
-            #endregion
-
-            #region Act
-
-            IList<CandleDTO> asserted_list;
-            using (var act_dbContext = new QuoteSourceDbContext(_optionsBuilder.Options))
-            {
-                QuoteSource _quoteSource =
-                    new QuoteSource(act_dbContext, _output.BuildLoggerFor<QuoteSource>(), _downloader);
-                asserted_list = _quoteSource.TopStock(Market.Enum.UsaStock, 1);
-            }
-
-            #endregion
-
-            #region Assert
-
-
-
-            #endregion
-        }
-
-        [Fact]
         public void LoadNewQuotesToDb()
         {
             #region Array

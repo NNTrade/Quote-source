@@ -23,6 +23,7 @@ namespace database.entity
 
         public Market Market { get; set; }
         public IList<StockTimeFrame> StockTimeFrames { get; set; }
+        public IList<Quote> Quotes { get; set; }
 
         #endregion
 

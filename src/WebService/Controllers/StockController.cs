@@ -26,14 +26,30 @@ namespace WebService.Controllers
         // GET /api/market/{market_id}/stock?code=
         [HttpGet(Name = "Get Stocks by query parametrs")]
         [ProducesResponseType(typeof(IList<StockDTO>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetStockByQuery(int market_id, [FromQuery]string? code = null)
+        public async Task<IActionResult> GetStockByQuery(int market_id, [FromQuery] string? code = null)
         {
-            _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockController),nameof(GetStockByQuery)),
-                "Request stock for: MarketId {@market_id}, Code {@code}", market_id,code);
+            _logger.LogInformation(LogEvent.CallEndpoint(nameof(StockController), nameof(GetStockByQuery)),
+                "Request stock for: MarketId {@market_id}, Code {@code}", market_id, code);
             var _stockDtos = await _quoteSource.StockSearch(market_id, code ?? "");
 
-            _logger.LogInformation( LogEvent.CallEndpoint(nameof(StockController),nameof(GetStockByQuery)),
+            _logger.LogInformation(LogEvent.CallEndpoint(nameof(StockController), nameof(GetStockByQuery)),
                 $"Response list of stock with {_stockDtos.Count} rows");
+            return Ok(_stockDtos);
+        }
+
+        // GET /api/market/{market_id}/stock/top/volume?years= &count=
+        [HttpGet("/top/volume", Name = "Get Stocks with top volume")]
+        [ProducesResponseType(typeof(IList<StockDTO>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetTopStockByVolume(int market_id, [FromQuery(Name = "years")] int years = 1,
+            [FromQuery(Name = "count")] int count = 100)
+        {
+            _logger.LogInformation(LogEvent.CallEndpoint(nameof(StockController), nameof(GetStockByQuery)),
+                "Request top {@count} stock by volume for: MarketId {@market_id}, for {@years} years", count, market_id,
+                years);
+            var _stockDtos = await _quoteSource.TopStockByVolume(market_id, years, count);
+
+            _logger.LogInformation(LogEvent.CallEndpoint(nameof(StockController), nameof(GetStockByQuery)),
+                $"Response list of top stock with {_stockDtos.Count} rows");
             return Ok(_stockDtos);
         }
     }
