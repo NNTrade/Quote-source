@@ -44,6 +44,7 @@ namespace WebService
             });
             serviceCollection.AddScoped<IDownloader, FinamDownloader>();
             serviceCollection.AddScoped<IAsyncQuoteSource, QuoteSource>();
+            serviceCollection.AddScoped<IExcludeFilter, ExcludeFilter>();
             serviceCollection.AddScoped<IIniter, Initer>();
 
             return serviceCollection;

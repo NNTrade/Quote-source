@@ -14,13 +14,14 @@ namespace AppCore
         private readonly QuoteSourceDbContext _dbContext;
         private readonly IDownloader _downloader;
         private readonly ILogger<IIniter> _logger;
+        private readonly IExcludeFilter _excludeFilter;
 
-        public Initer(QuoteSourceDbContext dbContext, IDownloader downloader, ILogger<IIniter> logger)
+        public Initer(QuoteSourceDbContext dbContext, IDownloader downloader, ILogger<IIniter> logger, IExcludeFilter excludeFilter)
         {
             _dbContext = dbContext;
             _downloader = downloader;
             _logger = logger;
-
+            _excludeFilter = excludeFilter;
         }
 
         public void Reinit()
@@ -34,7 +35,8 @@ namespace AppCore
 
         public void CheckInitStock()
         {
-            _logger.LogInformation($"Migrate to data base. Connection string: {_dbContext.Database.GetConnectionString()}");
+            _logger.LogInformation(
+                $"Migrate to data base. Connection string: {_dbContext.Database.GetConnectionString()}");
             _dbContext!.Database.Migrate();
             if (!_dbContext.Stock.Any())
             {
@@ -42,6 +44,7 @@ namespace AppCore
                 InitStocks();
             }
         }
+
         public void InitStocks()
         {
             foreach (Market.Enum market in Enum.GetValues<Market.Enum>())
@@ -49,7 +52,14 @@ namespace AppCore
                 _logger.LogInformation($"Load stock from market: {market.ToString()}");
                 LoadStocks(market).Wait();
             }
+            ExcludeBase().Wait();
             //await Parallel.ForEachAsync(Enum.GetValues<Market.Enum>(), (marketId, token) => LoadStocks(marketId));
+        }
+
+        private async Task ExcludeBase()
+        {
+            var excludedBTC_USD = _dbContext.Stock.Single(s => s.FinamId == 499054);
+            await _excludeFilter.Add(excludedBTC_USD.Id);
         }
 
         private async Task LoadStocks(Market.Enum marketId)
@@ -60,6 +70,16 @@ namespace AppCore
             {
                 _stock.MarketId = marketId;
                 _stock.Market = market;
+            }
+
+            var _duplicatedStocks = _stocks.GroupBy(s => s.Code).Where(s => s.Count() > 1);
+            if (_duplicatedStocks.Any())
+            {
+                foreach (var _duplicatedStock in _duplicatedStocks)
+                {
+                    _logger.LogWarning("Stock with code {@Code} has duplicates {@times} times", _duplicatedStock.Key,
+                        _duplicatedStock.Count());
+                }
             }
 
             await _dbContext.Stock.AddRangeAsync(_stocks);
