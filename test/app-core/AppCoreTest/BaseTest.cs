@@ -30,6 +30,10 @@ namespace database_test
             return _optionsBuilder;
         }
 
+        protected QuoteSourceDbContext CreateContext()
+        {
+            return new QuoteSourceDbContext(_optionsBuilder.Options);
+        }
         public BaseTest(string dbSuffix,ITestOutputHelper output)
         {
             _output = output;

@@ -19,6 +19,8 @@ namespace database.entity
 
         public int FinamId { get; set; }
 
+        public bool Exclude { get; set; }
+
         #region relation
 
         public Market Market { get; set; }
@@ -35,6 +37,7 @@ namespace database.entity
                 .WithMany(e => e.Stocks)
                 .HasForeignKey(e => e.MarketId)
                 .OnDelete(DeleteBehavior.Cascade);
+            entityTypeBuilder.Property(s => s.Exclude).HasDefaultValue(false);
         }
 
         public static Stock Build(QuoteSourceDbContext dbContext, Market.Enum marketId, string code, string name,

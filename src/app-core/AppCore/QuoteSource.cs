@@ -34,7 +34,7 @@ namespace AppCore
             var _stockTimeFrames = _dbContext.StockTimeFrame
                 .Include(s => s.Stock)
                 .Include(s => s.TimeFrame)
-                .SingleOrDefault(s => s.StockId == stockId && s.TimeFrameId == (TimeFrame.Enum)timeFrameId);
+                .SingleOrDefault(s => s.StockId == stockId && s.TimeFrameId == (TimeFrame.Enum)timeFrameId && !s.Stock.Exclude);
 
             if (_stockTimeFrames == null)
             {
@@ -45,6 +45,12 @@ namespace AppCore
                         new ArgumentOutOfRangeException(nameof(stockId), stockId,
                             $"Couldn't find stock"),
                         "Try load unknown stock {@stock}", stockId);
+                } else if (stock.Exclude)
+                {
+                    _logger.LogException(LogEvent.NoStock,
+                        new ArgumentOutOfRangeException(nameof(stockId), stockId,
+                            $"Stock is excluded"),
+                        "Try load excluded stock {@stock}", stockId);
                 }
 
                 var tf = await _dbContext.TimeFrame.SingleOrDefaultAsync(t => t.Id == (TimeFrame.Enum)timeFrameId);
@@ -184,7 +190,7 @@ namespace AppCore
 
         public async Task<IList<StockDTO>> StockSearch(int marketId, string code)
         {
-            var _stocks = _dbContext.Stock.Where(s => s.MarketId == (Market.Enum)marketId && s.Code.Contains(code));
+            var _stocks = _dbContext.Stock.Where(s => s.MarketId == (Market.Enum)marketId && s.Code.Contains(code) && !s.Exclude);
             return await _stocks.Select(s => s.ToDto()).ToListAsync();
         }
 
